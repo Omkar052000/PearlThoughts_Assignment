@@ -25,7 +25,7 @@ jobs:
     - name: Build, Tag and Push the Image to AWS ECR
       id: build-image
       env:
-        ECR_REGISTRY: my-ecr-repo
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: my-repo
         IMAGE_TAG: latest
       run: 
