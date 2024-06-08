@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "ap-south-1"
 }
 
 resource "aws_ecr_repository" "my_repository" {
@@ -10,10 +10,29 @@ resource "aws_ecs_cluster" "my_cluster" {
   name = "my-ecs-cluster"
 }
 
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecsTaskExecutionRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+    }]
+  })
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  ]
+}
+
 resource "aws_ecs_task_definition" "my_task" {
   family                   = "my-task-family"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   cpu                      = "256"
   memory                   = "512"
   
@@ -42,9 +61,24 @@ resource "aws_ecs_service" "my_service" {
 }
 
 data "aws_subnet" "default" {
-  default_for_az = true
+  filter {
+    name   = "default-for-az"
+    values = ["true"]
+  }
+  filter {
+    name   = "availability-zone"
+    values = ["ap-south-1a"] # specify the availability zone
+  }
 }
 
 data "aws_security_group" "default" {
-  name = "default"
+  filter {
+    name   = "group-name"
+    values = ["default"]
+  }
+  vpc_id = data.aws_vpc.default.id
+}
+
+data "aws_vpc" "default" {
+  default = true
 }
