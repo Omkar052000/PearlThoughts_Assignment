@@ -7,7 +7,7 @@ resource "aws_ecr_repository" "my_repository" {
 }
 
 resource "aws_ecs_cluster" "my_cluster" {
-  name = "my-ecs-cluster"
+  name = "my-ecs-clutser"
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
@@ -28,18 +28,17 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   ]
 }
 
-resource "aws_ecs_task_definition" "my_task" {
+resource "aws_ecs_task_definition" "my_ecs_task" {
   family                   = "my-task-family"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
   cpu                      = "256"
   memory                   = "512"
-  
+
   container_definitions = jsonencode([{
-    name  = "my-container"
-    image = "${aws_ecr_repository.my_repository.repository_url}:latest"
+    name      = "my-container"
+    image     = "${aws_ecr_repository.my_repository.repository_url}:latest"
     essential = true
     portMappings = [{
       containerPort = 80
@@ -48,33 +47,17 @@ resource "aws_ecs_task_definition" "my_task" {
   }])
 }
 
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecsTaskRole"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
 resource "aws_ecs_service" "my_service" {
   name            = "my-ecs-service"
   cluster         = aws_ecs_cluster.my_cluster.id
-  task_definition = aws_ecs_task_definition.my_task.arn
+  task_definition = aws_ecs_task_definition.my_ecs_task.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [data.aws_subnet.default.id]
-    security_groups = [data.aws_security_group.default.id]
+    subnets          = [data.aws_subnet.default.id] 
+    security_groups  = [data.aws_security_group.default.id] 
+    assign_public_ip = true
   }
 }
 
