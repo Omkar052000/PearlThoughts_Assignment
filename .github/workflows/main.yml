@@ -6,7 +6,7 @@ on:
 jobs:
   build-and-push:
     name: Build and Push to AWS ECR
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
