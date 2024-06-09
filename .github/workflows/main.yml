@@ -30,7 +30,7 @@ jobs:
         IMAGE_TAG: latest
       run: 
         - name: Build and push Docker image
-  run: |
+  run: 
     docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} .
     docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
