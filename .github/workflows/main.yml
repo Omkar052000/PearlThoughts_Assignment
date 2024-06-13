@@ -1,4 +1,5 @@
 name: Build node js application image
+
 on:
   push:
     branches: [ main ] 
@@ -33,15 +34,13 @@ jobs:
         docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} .
         docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
-  - name: Deploy to ECS
+    - name: Deploy to ECS
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ap-south-1
-        CLUSTER_NAME: my-ecs-clutser
+        CLUSTER_NAME: my-ecs-cluster
         SERVICE_NAME: my-ecs-service
         IMAGE_URL: 7332-3998-7477.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
       run: |
-        aws ecs update-service --cluster $my-ecs-clutser --service $my-ecs-service --force-new-deployment --region $ap-south-1
-
-   
+        aws ecs update-service --cluster $my-ecs-cluster --service $my-ecs-service --force-new-deployment --region $ap-south-1
