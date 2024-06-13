@@ -43,4 +43,4 @@ jobs:
         SERVICE_NAME: my-ecs-service
         IMAGE_URL: 7332-3998-7477.dkr.ecr.ap-south-1.amazonaws.com/my-ecr-repo:latest
       run: |
-        aws ecs update-service --cluster $my-ecs-cluster --service $my-ecs-service --force-new-deployment --region $ap-south-1
+        aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --force-new-deployment --region $AWS_REGION
